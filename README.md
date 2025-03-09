@@ -8,4 +8,4 @@ A little about me:
 - I am taking STATS 220 because my friends said it was a good course
 - I am interested in learning about Game Devlopment
 
-A meme that captures how I currently feel about my university studies is ![](https://c.tenor.com/8druEACXtX8AAAAd/tenor.gif)
+I love honey pie \(#^#)/ ![](https://media1.tenor.com/m/WWsBijR9E74AAAAd/honey-pie-gif-honey-pie-meme.gif)
