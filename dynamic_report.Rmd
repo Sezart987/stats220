@@ -1,0 +1,203 @@
+---
+title: My dynamic report
+output: html_fragment
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, error=FALSE)
+
+```
+
+```{css}
+
+body{
+color: black;
+background-color: #f5f5f5;
+font-size: 19px; 
+}
+
+h1, h2, h3{
+font-family: "Roboto", sans-serif;
+font-weight: bold;
+padding-bottom: 10px;
+}
+
+p{
+text-align: justify;
+line-height: 1.5;
+font-family: "Roboto", sans-serif;
+}
+
+```
+
+# A small survey of the different habits of people on YouTube
+
+Note: Considering that I do not know a lot of people the data collected is barely sufficient for making a thorough analysis but considering the diverse responses I got I will try my best to make it relevant to the subjected survey.
+
+
+## Collecting Data
+
+From the Google Form survey given those are the responses received.
+As we can see form a population of 22 people concerning their habits on YouTube.<br>
+The important data to note are: <br>
+<ul>
+  <li style="font-family: "Roboto", sans-serif;" >When people are on YouTube</li>
+  <li style="font-family: "Roboto", sans-serif;">Hours per week spent on YouTube</li>
+  <li style="font-family: "Roboto", sans-serif;">Contents type</li>
+</ul>
+Moreover, we also have to consider the type of contents they are watching.
+As shown below we have the type of contents but not the percentage and finding the frequency of the data above would troublesome.
+```{r}
+
+library(tidyverse)
+library(magick)
+
+csv_link <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vQGQA6wiMra1VqA2EYs5IVHi5Gm8_sREWCw6Jt4thncOpya-U24h3dgVVhev79AcBUB-LWcdwAjV_eM/pub?output=csv"
+
+logged_data <- read.csv(csv_link)
+
+# renaming for better experience
+logged_data <- logged_data %>%
+  rename("When on YouTube"= How.often.do.you.watch.YouTube.) %>%
+  rename("Time of entry" = Timestamp) %>%
+  rename("H/w spent on YT" = How.many.hours.per.week.do.you.spend.watching.YouTube.) %>%
+  rename("Contents type" = What.type.of.contents.do.you.prefer.watching.on.YouTube.)
+
+# view and check the structure of the file
+logged_data %>% slice(1:n())
+
+
+#####################################################
+
+# The R code above represents the data
+# The 3 charts are: 
+# a pie chart representing the YT watchtime frequency,
+# a graph representing 
+# a graph representing  
+#
+# The summary value YT_time_average represents the percentage of frequency
+# and how responses are distributed, feels pertinent to know the frequency 
+# people go on YT to correlate with the second summary value
+# The summary value YT_per_week_summary represents the hours people go on YT
+# pertinent because if we cross them with the response we could make a 
+# deduction that people who have a higher than average watchtime are more likely
+# to spend time daily on YT
+
+
+```
+## Modeling the data entry
+
+Let's make some charts to represent our data and some observation
+
+
+
+<table>
+  <tr>
+    <td style="width: 50%;">
+```{r}
+# pie chart of YT frequency watch time
+frequency_watchtime <- 
+  ggplot(logged_data, aes(x = "", y = `H/w spent on YT`, fill = `When on YouTube`)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar(theta = "y") +
+  labs(title = "YouTube Watching Frequency", fill = "Frequency") +
+  theme_void()
+print(frequency_watchtime)
+
+
+```
+    </td>
+    <td style="width: 50%; vertical-align: top;">
+      <br><p>This pie chart represents the frequency of YouTube watch time.  
+      As we can see there are a lot of people watching YouTube on a daily basis and small minority that watch it sparsely.</p>
+    </td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td style="width:50%;">
+```{r}
+# chart for correlation between frequency and hours spent per week on YT
+frequency_hours <- ggplot(logged_data, aes(x = `When on YouTube`, y = `H/w spent on YT`, fill = `When on YouTube`)) + 
+  geom_boxplot() +
+  labs(title = "YouTube Watching Frequency vs. Hours Spent per Week",
+       x = "Watch Frequency", 
+       y = "Hours per Week") +
+  theme_minimal()
+print(frequency_hours)
+
+
+```
+    </td>
+    <td style="width: 50%; vertical-align: top;">
+      <br><p>This chart represents the correlation between the watch time frequency and the hours spent on the app.  
+      As we can see, even though the data is not large enough, people who spend time daily on YouTube have a higher time spent.</p>
+    </td>
+  </tr>
+</table>
+
+
+<table>
+  <tr>
+    <td style="width:50%;">
+```{r}
+# chart for correlation with content types and hours per week spent
+content_per_hours <- ggplot(logged_data, aes(x = `Contents type`,
+                                             y = `H/w spent on YT`,
+                                             fill = `Contents type`)) + 
+  geom_violin() + 
+  coord_flip() + 
+  labs(title = "YouTube Content type Vs Hours spent", x = "Content type", y = "Hours per week") +
+  theme_minimal()
+print(content_per_hours)
+
+```
+    </td>
+    <td style="width: 50%; vertical-align: top;">
+      <br><p>This chart represents the  between the type of contents watched and the hours people spent on the application.  
+      The data set is not large enough and therefore no helpful observation could be made with this chart except that the contents are pretty diverse.</p>
+    </td>
+  </tr>
+</table>
+
+## Summary values
+
+Let's take a look at the summary values that seemed relevant with the chart and our observations.<br>
+<br>
+Firstly, now that we have the numbers, as we can see below and have discussed in the pie chart above, there are 72% (16) of people who spent their time daily on the application.
+
+```{r}
+# summary value for usage of YT (not in hours)
+YT_time_average <- logged_data %>%
+  count(`When on YouTube`) %>%
+  mutate(Percentage = (n / sum(n)) * 100)
+print(YT_time_average)
+```
+
+<p>Moreover, the more recurrent contents are Gaming, Music videos, Vlogs and Sketches.And this percentage below would be the percentage of the contents type.</p>
+
+
+```{r}
+# 
+# gives the min, max, median of watch time per week
+YT_per_week_summary <- summary(logged_data$`H/w spent on YT`)
+
+# percentage of content summary
+# summary of the type of contents people watch
+content_summary <- logged_data %>%
+  count(`Contents type`) %>%
+  mutate(Percentage = (n / sum(n)) * 100)
+print(content_summary)
+```
+
+## Observation 
+
+Based on the (small) data taken we can make some observations.<br>
+
+<ul>
+  <li style="font-family: "Roboto", sans-serif;" >People who watch YouTube daily are more likely to who have a higher watch time and hours spent on the application, which should be obvious.</li>
+  <li style="font-family: "Roboto", sans-serif;">There seems to be a trend of watching gaming, music videos, vlogs, and comedy contents</li>
+</ul>
+
+![](https://media1.tenor.com/m/WWsBijR9E74AAAAd/honey-pie-gif-honey-pie-meme.gif)
